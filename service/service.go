@@ -54,7 +54,7 @@ func addInventory(items map[string]uint64) error {
 	return nil
 }
 
-func processOrder(order Order) error {
+func processOrder(order order.Order) error {
 	log.Printf("received order %s, checking if processable...", order.ToString())
 
 	// check if our current supply is sufficient enough to process the order
@@ -103,11 +103,11 @@ func checkInventory(itemId string) (uint64, error) {
 	}
 
 	var inventoryAmount uint64
-	err = binary.Read(resp.Body, binary.LittleEndian, inventoryAmount)
+	err = binary.Read(resp.Body, binary.LittleEndian, &inventoryAmount)
 	if err != nil {
 		return 0, err
 	}
-
+	log.Printf("lookup counter for id %s", itemId)
 	return inventoryAmount, nil
 }
 
