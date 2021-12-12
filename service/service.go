@@ -42,10 +42,9 @@ func addInventory(items map[string]uint64) error {
 	for k, v := range items {
 		path := fmt.Sprintf("/counter/%v", k)
 		for i := 0; i < int(v); i++ {
-			// TODO handle response
+			// this request has no response, so we omit handling it
 			_, err := http.Post(counterServerAddr+path, "", nil)
 			if err != nil {
-				// TODO: handle error
 				return err
 			}
 		}
@@ -115,10 +114,14 @@ func rollback(m map[string]uint64) {
 	for item, amount := range m {
 		path := fmt.Sprintf("/counter/%v", item)
 		for i := 0; i < int(amount); i++ {
-			// TODO handle response
-			_, err := http.Post(counterServerAddr+path, "", nil)
-			if err != nil {
-				// TODO handle error by retrying until correct status is achieved
+			done := false
+			for !done {
+				_, err := http.Post(counterServerAddr+path, "", nil)
+				if err != nil {
+					// do nothing, we try again
+				} else {
+					done = true
+				}
 			}
 		}
 	}
